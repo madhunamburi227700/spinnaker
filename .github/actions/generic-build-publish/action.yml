@@ -92,9 +92,10 @@ runs:
       if: github.event_name == 'pull_request' && inputs.integration-test != 'false'
       env:
         ORG_GRADLE_PROJECT_version: ${{ steps.version.outputs.version }}
+        INTEGRATION_TEST_BUILD_COMMAND: ${{ !inputs.integration-test-build-command && format(':{0}:{0}-web:installDist', inputs.project) || inputs.integration-test-build-command }}
       shell: bash
       run: |
-        ./gradlew ${{ !inputs.integration-test-build-command && format(':{0}:{0}-web:installDist', inputs.project) || inputs.integration-test-build-command }}
+        ./gradlew $INTEGRATION_TEST_BUILD_COMMAND
 
     - name: Container Integration Tests (build)
       if: github.event_name == 'pull_request' && inputs.integration-test != 'false'
@@ -118,8 +119,10 @@ runs:
       env:
         FULL_DOCKER_IMAGE_NAME: "${{ inputs.project }}-${{ steps.version.outputs.version }}-integration-test"
         GRADLE_OPTS: ${{ inputs.gradle-opts }}
+        GRADLE_CMD_OPTS: ${{ inputs.gradle-cmd-opts }}
+        PROJECT: ${{ inputs.project }}
       shell: bash
-      run: ./gradlew ${{ inputs.gradle-cmd-opts }} -Dorg.gradle.daemon=false :${{ inputs.project }}:${{ inputs.project }}-integration:test
+      run: ./gradlew $GRADLE_CMD_OPTS -Dorg.gradle.daemon=false :${PROJECT}:${PROJECT}-integration:test
 
     # Containers should generally be built in PRs to ensure that Dockerfiles are functioning properly
     - name: Build/Publish Docker containers
