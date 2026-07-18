@@ -82,10 +82,8 @@ runs:
       shell: bash
       env:
         GRADLE_OPTS: ${{ inputs.gradle-opts }}
-        GRADLE_CMD_OPTS: ${{ inputs.gradle-cmd-opts }}
-        PROJECT: ${{ inputs.project }}
       run: |
-        ./gradlew $GRADLE_CMD_OPTS -Dorg.gradle.daemon=false --stacktrace ":${PROJECT}:build"
+        ./gradlew ${{ inputs.gradle-cmd-opts }} -Dorg.gradle.daemon=false --stacktrace ':${{ inputs.project }}:build'
 
     # If configured, build a container, publish it locally, and run its tests
     - name: Run build to produce container artifacts
